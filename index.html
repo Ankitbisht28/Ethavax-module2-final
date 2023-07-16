@@ -20,13 +20,15 @@
     </style>
 </head>
 <body>
-	<button onclick="connectMetamask()">CONNECT TO METAMASK</button> <br>
-	<p id="accountArea"></p>
-	<button onclick="connectContract()">CONNECT TO CONTRACT</button> <br>
-	<p id="contractArea"></p>
-	<button onclick="readContract()">GET DATA FROM CONTRACT</button> <br>
-	<p id="dataArea"></p>
-
+    <button onclick="connectMetamask()">CONNECT TO METAMASK</button> <br>
+    <p id="accountArea"></p>
+    <button onclick="connectContract()">CONNECT TO CONTRACT</button> <br>
+    <p id="contractArea"></p>
+    <button onclick="readContract()">GET DATA FROM CONTRACT</button> <br>
+    <p id="dataArea"></p>
+    <button onclick="updateContract()">UPDATE CONTRACT</button> <br>
+    <input type="text" id="cityInput" placeholder="Enter city">
+    <p id="updateStatus"></p>
 
     <script>
         //1- connect metamask
@@ -42,30 +44,50 @@
         //2- connect to smart contract
         const connectContract = async () => {
             const ABI = [
-	{
-		"inputs": [],
-		"name": "myCity",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	}
-            ] ;
-            const Address = "0x6406cbB7d3162E52134aA9f8a3A86578a4DD9b04";
+                {
+                    "inputs": [],
+                    "name": "getCity",
+                    "outputs": [
+                        {
+                            "internalType": "string",
+                            "name": "",
+                            "type": "string"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "string",
+                            "name": "newCity",
+                            "type": "string"
+                        }
+                    ],
+                    "name": "setCity",
+                    "outputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }
+            ];
+            const Address = "0x3d6F38a6D7F3a8b4491EbcAc53bD6b8D30F4A289";
             window.web3 = await new Web3(window.ethereum);
-            window.contract = await new window.web3.eth.Contract( ABI, Address); 
+            window.contract = await new window.web3.eth.Contract(ABI, Address); 
             document.getElementById("contractArea").innerHTML = "connected to smart contract";
         }
 
-        //3-read data from smart contract
+        //3- read data from smart contract
         const readContract = async () => {
-            const data = await window.contract.methods.myCity().call();
+            const data = await window.contract.methods.getCity().call();
             document.getElementById("dataArea").innerHTML = data;
+        }
+
+        //4- update data in smart contract
+        const updateContract = async () => {
+            const newCity = document.getElementById("cityInput").value;
+            await window.contract.methods.setCity(newCity).send({ from: account });
+            document.getElementById("updateStatus").innerHTML = "Contract updated successfully";
         }
     </script>
 </body>
